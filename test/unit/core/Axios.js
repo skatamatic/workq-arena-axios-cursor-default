@@ -2,6 +2,22 @@ import Axios from "../../../lib/core/Axios.js";
 import assert from "assert";
 
 describe('Axios', function () {
+  describe('constructor defaults', function () {
+    it('should allow getUri when constructed without a config argument', function () {
+      const instance = new Axios();
+      assert.strictEqual(instance.getUri({url: '/ping'}), '/ping');
+    });
+
+    it('should honor function-valued paramsSerializer in getUri', function () {
+      const instance = new Axios({});
+      assert.strictEqual(instance.getUri({
+        url: '/search',
+        params: {q: 'hello'},
+        paramsSerializer: () => 'custom=yes'
+      }), '/search?custom=yes');
+    });
+  });
+
   describe("handle un-writable error stack", function () {
     async function testUnwritableErrorStack(stackAttributes) {
       const axios = new Axios({});
