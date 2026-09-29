@@ -13,6 +13,28 @@ describe('Axios', function () {
       assert.strictEqual(uri, '/search?custom=yes');
     });
 
+    it('should apply a function paramsSerializer from defaults', function () {
+      const axios = new Axios({
+        paramsSerializer: () => 'from=defaults'
+      });
+      assert.strictEqual(
+        axios.getUri({url: '/search', params: {q: 'hello'}}),
+        '/search?from=defaults'
+      );
+    });
+
+    it('should apply an object-form paramsSerializer', function () {
+      const axios = new Axios({});
+      const uri = axios.getUri({
+        url: '/search',
+        params: {q: 'hello'},
+        paramsSerializer: {
+          serialize: () => 'object=form'
+        }
+      });
+      assert.strictEqual(uri, '/search?object=form');
+    });
+
     it('should allow constructing without a config argument', function () {
       const axios = new Axios();
       assert.strictEqual(axios.getUri({url: '/ping'}), '/ping');
