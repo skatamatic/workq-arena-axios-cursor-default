@@ -1,4 +1,4 @@
-// Axios v1.7.7 Copyright (c) 2024 Matt Zabriskie and contributors
+// Axios v1.7.7 Copyright (c) 2026 Matt Zabriskie and contributors
 'use strict';
 
 function bind(fn, thisArg) {
@@ -3233,7 +3233,7 @@ const validators = validator.validators;
  */
 class Axios {
   constructor(instanceConfig) {
-    this.defaults = instanceConfig;
+    this.defaults = instanceConfig || {};
     this.interceptors = {
       request: new InterceptorManager$1(),
       response: new InterceptorManager$1()
@@ -3401,6 +3401,11 @@ class Axios {
   getUri(config) {
     config = mergeConfig(this.defaults, config);
     const fullPath = buildFullPath(config.baseURL, config.url);
+    if (utils$1.isFunction(config.paramsSerializer)) {
+      config.paramsSerializer = {
+        serialize: config.paramsSerializer
+      };
+    }
     return buildURL(fullPath, config.params, config.paramsSerializer);
   }
 }

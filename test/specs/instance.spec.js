@@ -158,4 +158,16 @@ describe('instance', function () {
     };
     expect(instance.getUri(options)).toBe('https://api.example.com/foo/bar?foo=bar&name=axios');
   });
+
+  it('should apply a function-valued paramsSerializer in getUri', function () {
+    expect(axios.getUri({
+      url: '/search',
+      params: {q: 'hello'},
+      paramsSerializer: () => 'custom=yes'
+    })).toBe('/search?custom=yes');
+  });
+
+  it('should allow constructing Axios without a config argument', function () {
+    expect(new axios.Axios().getUri({url: '/ping'})).toBe('/ping');
+  });
 });
