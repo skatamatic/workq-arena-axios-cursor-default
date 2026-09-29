@@ -1,4 +1,4 @@
-// Axios v1.7.7 Copyright (c) 2024 Matt Zabriskie and contributors
+// Axios v1.7.7 Copyright (c) 2026 Matt Zabriskie and contributors
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
@@ -1727,7 +1727,7 @@
    * @returns {string} The encoded value.
    */
   function encode(val) {
-    return encodeURIComponent(val).replace(/%3A/gi, ':').replace(/%24/g, '$').replace(/%2C/gi, ',').replace(/%20/g, '+').replace(/%5B/gi, '[').replace(/%5D/gi, ']');
+    return encodeURIComponent(val).replace(/%3A/gi, ":").replace(/%24/g, "$").replace(/%2C/gi, ",").replace(/%20/g, "+").replace(/%5B/gi, "[").replace(/%5D/gi, "]");
   }
 
   /**
@@ -1735,7 +1735,7 @@
    *
    * @param {string} url The base of the url (e.g., http://www.google.com)
    * @param {object} [params] The params to be appended
-   * @param {?object} options
+   * @param {?(object|Function)} options
    *
    * @returns {string} The formatted url
    */
@@ -1745,6 +1745,11 @@
       return url;
     }
     var _encode = options && options.encode || encode;
+    if (utils$1.isFunction(options)) {
+      options = {
+        serialize: options
+      };
+    }
     var serializeFn = options && options.serialize;
     var serializedParams;
     if (serializeFn) {
@@ -1757,7 +1762,7 @@
       if (hashmarkIndex !== -1) {
         url = url.slice(0, hashmarkIndex);
       }
-      url += (url.indexOf('?') === -1 ? '?' : '&') + serializedParams;
+      url += (url.indexOf("?") === -1 ? "?" : "&") + serializedParams;
     }
     return url;
   }
@@ -3806,7 +3811,7 @@
   var Axios = /*#__PURE__*/function () {
     function Axios(instanceConfig) {
       _classCallCheck(this, Axios);
-      this.defaults = instanceConfig;
+      this.defaults = instanceConfig || {};
       this.interceptors = {
         request: new InterceptorManager$1(),
         response: new InterceptorManager$1()
@@ -3841,13 +3846,13 @@
                   Error.captureStackTrace ? Error.captureStackTrace(dummy = {}) : dummy = new Error();
 
                   // slice off the Error: ... line
-                  stack = dummy.stack ? dummy.stack.replace(/^.+\n/, '') : '';
+                  stack = dummy.stack ? dummy.stack.replace(/^.+\n/, "") : "";
                   try {
                     if (!_context.t0.stack) {
                       _context.t0.stack = stack;
                       // match without the 2 top stack lines
-                    } else if (stack && !String(_context.t0.stack).endsWith(stack.replace(/^.+\n.+\n/, ''))) {
-                      _context.t0.stack += '\n' + stack;
+                    } else if (stack && !String(_context.t0.stack).endsWith(stack.replace(/^.+\n.+\n/, ""))) {
+                      _context.t0.stack += "\n" + stack;
                     }
                   } catch (e) {
                     // ignore the case where "stack" is an un-writable property
@@ -3870,7 +3875,7 @@
       value: function _request(configOrUrl, config) {
         /*eslint no-param-reassign:0*/
         // Allow for axios('example/url'[, config]) a la fetch API
-        if (typeof configOrUrl === 'string') {
+        if (typeof configOrUrl === "string") {
           config = config || {};
           config.url = configOrUrl;
         } else {
@@ -3902,11 +3907,11 @@
         }
 
         // Set config.method
-        config.method = (config.method || this.defaults.method || 'get').toLowerCase();
+        config.method = (config.method || this.defaults.method || "get").toLowerCase();
 
         // Flatten headers
         var contextHeaders = headers && utils$1.merge(headers.common, headers[config.method]);
-        headers && utils$1.forEach(['delete', 'get', 'head', 'post', 'put', 'patch', 'common'], function (method) {
+        headers && utils$1.forEach(["delete", "get", "head", "post", "put", "patch", "common"], function (method) {
           delete headers[method];
         });
         config.headers = AxiosHeaders$1.concat(contextHeaders, headers);
@@ -3915,7 +3920,7 @@
         var requestInterceptorChain = [];
         var synchronousRequestInterceptors = true;
         this.interceptors.request.forEach(function unshiftRequestInterceptors(interceptor) {
-          if (typeof interceptor.runWhen === 'function' && interceptor.runWhen(config) === false) {
+          if (typeof interceptor.runWhen === "function" && interceptor.runWhen(config) === false) {
             return;
           }
           synchronousRequestInterceptors = synchronousRequestInterceptors && interceptor.synchronous;
@@ -3974,7 +3979,7 @@
     }]);
     return Axios;
   }(); // Provide aliases for supported request methods
-  utils$1.forEach(['delete', 'get', 'head', 'options'], function forEachMethodNoData(method) {
+  utils$1.forEach(["delete", "get", "head", "options"], function forEachMethodNoData(method) {
     /*eslint func-names:0*/
     Axios.prototype[method] = function (url, config) {
       return this.request(mergeConfig(config || {}, {
@@ -3984,7 +3989,7 @@
       }));
     };
   });
-  utils$1.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
+  utils$1.forEach(["post", "put", "patch"], function forEachMethodWithData(method) {
     /*eslint func-names:0*/
 
     function generateHTTPMethod(isForm) {
@@ -3992,7 +3997,7 @@
         return this.request(mergeConfig(config || {}, {
           method: method,
           headers: isForm ? {
-            'Content-Type': 'multipart/form-data'
+            "Content-Type": "multipart/form-data"
           } : {},
           url: url,
           data: data
@@ -4000,7 +4005,7 @@
       };
     }
     Axios.prototype[method] = generateHTTPMethod();
-    Axios.prototype[method + 'Form'] = generateHTTPMethod(true);
+    Axios.prototype[method + "Form"] = generateHTTPMethod(true);
   });
   var Axios$1 = Axios;
 

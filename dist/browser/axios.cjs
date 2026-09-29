@@ -1,4 +1,4 @@
-// Axios v1.7.7 Copyright (c) 2024 Matt Zabriskie and contributors
+// Axios v1.7.7 Copyright (c) 2026 Matt Zabriskie and contributors
 'use strict';
 
 function bind(fn, thisArg) {
@@ -1138,13 +1138,13 @@ prototype.toString = function toString(encoder) {
  * @returns {string} The encoded value.
  */
 function encode(val) {
-  return encodeURIComponent(val).
-    replace(/%3A/gi, ':').
-    replace(/%24/g, '$').
-    replace(/%2C/gi, ',').
-    replace(/%20/g, '+').
-    replace(/%5B/gi, '[').
-    replace(/%5D/gi, ']');
+  return encodeURIComponent(val)
+    .replace(/%3A/gi, ":")
+    .replace(/%24/g, "$")
+    .replace(/%2C/gi, ",")
+    .replace(/%20/g, "+")
+    .replace(/%5B/gi, "[")
+    .replace(/%5D/gi, "]");
 }
 
 /**
@@ -1152,7 +1152,7 @@ function encode(val) {
  *
  * @param {string} url The base of the url (e.g., http://www.google.com)
  * @param {object} [params] The params to be appended
- * @param {?object} options
+ * @param {?(object|Function)} options
  *
  * @returns {string} The formatted url
  */
@@ -1161,8 +1161,14 @@ function buildURL(url, params, options) {
   if (!params) {
     return url;
   }
-  
-  const _encode = options && options.encode || encode;
+
+  const _encode = (options && options.encode) || encode;
+
+  if (utils$1.isFunction(options)) {
+    options = {
+      serialize: options,
+    };
+  }
 
   const serializeFn = options && options.serialize;
 
@@ -1171,9 +1177,9 @@ function buildURL(url, params, options) {
   if (serializeFn) {
     serializedParams = serializeFn(params, options);
   } else {
-    serializedParams = utils$1.isURLSearchParams(params) ?
-      params.toString() :
-      new AxiosURLSearchParams(params, options).toString(_encode);
+    serializedParams = utils$1.isURLSearchParams(params)
+      ? params.toString()
+      : new AxiosURLSearchParams(params, options).toString(_encode);
   }
 
   if (serializedParams) {
@@ -1182,7 +1188,7 @@ function buildURL(url, params, options) {
     if (hashmarkIndex !== -1) {
       url = url.slice(0, hashmarkIndex);
     }
-    url += (url.indexOf('?') === -1 ? '?' : '&') + serializedParams;
+    url += (url.indexOf("?") === -1 ? "?" : "&") + serializedParams;
   }
 
   return url;
@@ -3233,10 +3239,10 @@ const validators = validator.validators;
  */
 class Axios {
   constructor(instanceConfig) {
-    this.defaults = instanceConfig;
+    this.defaults = instanceConfig || {};
     this.interceptors = {
       request: new InterceptorManager$1(),
-      response: new InterceptorManager$1()
+      response: new InterceptorManager$1(),
     };
   }
 
@@ -3255,16 +3261,21 @@ class Axios {
       if (err instanceof Error) {
         let dummy;
 
-        Error.captureStackTrace ? Error.captureStackTrace(dummy = {}) : (dummy = new Error());
+        Error.captureStackTrace
+          ? Error.captureStackTrace((dummy = {}))
+          : (dummy = new Error());
 
         // slice off the Error: ... line
-        const stack = dummy.stack ? dummy.stack.replace(/^.+\n/, '') : '';
+        const stack = dummy.stack ? dummy.stack.replace(/^.+\n/, "") : "";
         try {
           if (!err.stack) {
             err.stack = stack;
             // match without the 2 top stack lines
-          } else if (stack && !String(err.stack).endsWith(stack.replace(/^.+\n.+\n/, ''))) {
-            err.stack += '\n' + stack;
+          } else if (
+            stack &&
+            !String(err.stack).endsWith(stack.replace(/^.+\n.+\n/, ""))
+          ) {
+            err.stack += "\n" + stack;
           }
         } catch (e) {
           // ignore the case where "stack" is an un-writable property
@@ -3278,7 +3289,7 @@ class Axios {
   _request(configOrUrl, config) {
     /*eslint no-param-reassign:0*/
     // Allow for axios('example/url'[, config]) a la fetch API
-    if (typeof configOrUrl === 'string') {
+    if (typeof configOrUrl === "string") {
       config = config || {};
       config.url = configOrUrl;
     } else {
@@ -3287,64 +3298,89 @@ class Axios {
 
     config = mergeConfig(this.defaults, config);
 
-    const {transitional, paramsSerializer, headers} = config;
+    const { transitional, paramsSerializer, headers } = config;
 
     if (transitional !== undefined) {
-      validator.assertOptions(transitional, {
-        silentJSONParsing: validators.transitional(validators.boolean),
-        forcedJSONParsing: validators.transitional(validators.boolean),
-        clarifyTimeoutError: validators.transitional(validators.boolean)
-      }, false);
+      validator.assertOptions(
+        transitional,
+        {
+          silentJSONParsing: validators.transitional(validators.boolean),
+          forcedJSONParsing: validators.transitional(validators.boolean),
+          clarifyTimeoutError: validators.transitional(validators.boolean),
+        },
+        false,
+      );
     }
 
     if (paramsSerializer != null) {
       if (utils$1.isFunction(paramsSerializer)) {
         config.paramsSerializer = {
-          serialize: paramsSerializer
+          serialize: paramsSerializer,
         };
       } else {
-        validator.assertOptions(paramsSerializer, {
-          encode: validators.function,
-          serialize: validators.function
-        }, true);
+        validator.assertOptions(
+          paramsSerializer,
+          {
+            encode: validators.function,
+            serialize: validators.function,
+          },
+          true,
+        );
       }
     }
 
     // Set config.method
-    config.method = (config.method || this.defaults.method || 'get').toLowerCase();
+    config.method = (
+      config.method ||
+      this.defaults.method ||
+      "get"
+    ).toLowerCase();
 
     // Flatten headers
-    let contextHeaders = headers && utils$1.merge(
-      headers.common,
-      headers[config.method]
-    );
+    let contextHeaders =
+      headers && utils$1.merge(headers.common, headers[config.method]);
 
-    headers && utils$1.forEach(
-      ['delete', 'get', 'head', 'post', 'put', 'patch', 'common'],
-      (method) => {
-        delete headers[method];
-      }
-    );
+    headers &&
+      utils$1.forEach(
+        ["delete", "get", "head", "post", "put", "patch", "common"],
+        (method) => {
+          delete headers[method];
+        },
+      );
 
     config.headers = AxiosHeaders$1.concat(contextHeaders, headers);
 
     // filter out skipped interceptors
     const requestInterceptorChain = [];
     let synchronousRequestInterceptors = true;
-    this.interceptors.request.forEach(function unshiftRequestInterceptors(interceptor) {
-      if (typeof interceptor.runWhen === 'function' && interceptor.runWhen(config) === false) {
-        return;
-      }
+    this.interceptors.request.forEach(
+      function unshiftRequestInterceptors(interceptor) {
+        if (
+          typeof interceptor.runWhen === "function" &&
+          interceptor.runWhen(config) === false
+        ) {
+          return;
+        }
 
-      synchronousRequestInterceptors = synchronousRequestInterceptors && interceptor.synchronous;
+        synchronousRequestInterceptors =
+          synchronousRequestInterceptors && interceptor.synchronous;
 
-      requestInterceptorChain.unshift(interceptor.fulfilled, interceptor.rejected);
-    });
+        requestInterceptorChain.unshift(
+          interceptor.fulfilled,
+          interceptor.rejected,
+        );
+      },
+    );
 
     const responseInterceptorChain = [];
-    this.interceptors.response.forEach(function pushResponseInterceptors(interceptor) {
-      responseInterceptorChain.push(interceptor.fulfilled, interceptor.rejected);
-    });
+    this.interceptors.response.forEach(
+      function pushResponseInterceptors(interceptor) {
+        responseInterceptorChain.push(
+          interceptor.fulfilled,
+          interceptor.rejected,
+        );
+      },
+    );
 
     let promise;
     let i = 0;
@@ -3392,7 +3428,10 @@ class Axios {
     len = responseInterceptorChain.length;
 
     while (i < len) {
-      promise = promise.then(responseInterceptorChain[i++], responseInterceptorChain[i++]);
+      promise = promise.then(
+        responseInterceptorChain[i++],
+        responseInterceptorChain[i++],
+      );
     }
 
     return promise;
@@ -3406,36 +3445,45 @@ class Axios {
 }
 
 // Provide aliases for supported request methods
-utils$1.forEach(['delete', 'get', 'head', 'options'], function forEachMethodNoData(method) {
-  /*eslint func-names:0*/
-  Axios.prototype[method] = function(url, config) {
-    return this.request(mergeConfig(config || {}, {
-      method,
-      url,
-      data: (config || {}).data
-    }));
-  };
-});
+utils$1.forEach(
+  ["delete", "get", "head", "options"],
+  function forEachMethodNoData(method) {
+    /*eslint func-names:0*/
+    Axios.prototype[method] = function (url, config) {
+      return this.request(
+        mergeConfig(config || {}, {
+          method,
+          url,
+          data: (config || {}).data,
+        }),
+      );
+    };
+  },
+);
 
-utils$1.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
+utils$1.forEach(["post", "put", "patch"], function forEachMethodWithData(method) {
   /*eslint func-names:0*/
 
   function generateHTTPMethod(isForm) {
     return function httpMethod(url, data, config) {
-      return this.request(mergeConfig(config || {}, {
-        method,
-        headers: isForm ? {
-          'Content-Type': 'multipart/form-data'
-        } : {},
-        url,
-        data
-      }));
+      return this.request(
+        mergeConfig(config || {}, {
+          method,
+          headers: isForm
+            ? {
+                "Content-Type": "multipart/form-data",
+              }
+            : {},
+          url,
+          data,
+        }),
+      );
     };
   }
 
   Axios.prototype[method] = generateHTTPMethod();
 
-  Axios.prototype[method + 'Form'] = generateHTTPMethod(true);
+  Axios.prototype[method + "Form"] = generateHTTPMethod(true);
 });
 
 var Axios$1 = Axios;
