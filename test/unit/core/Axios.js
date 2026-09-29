@@ -43,5 +43,11 @@ describe('Axios', function () {
         }
       })
     });
-  })
+  });
+
+  it('should not throw if the config argument is omitted', function () {
+    const axios = new Axios();
+
+    assert.deepStrictEqual(axios.defaults, {});
+  });
 });

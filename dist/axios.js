@@ -1,4 +1,4 @@
-// Axios v1.7.7 Copyright (c) 2024 Matt Zabriskie and contributors
+// Axios v1.7.7 Copyright (c) 2026 Matt Zabriskie and contributors
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
@@ -1735,7 +1735,7 @@
    *
    * @param {string} url The base of the url (e.g., http://www.google.com)
    * @param {object} [params] The params to be appended
-   * @param {?object} options
+   * @param {?(object|Function)} options
    *
    * @returns {string} The formatted url
    */
@@ -1745,6 +1745,11 @@
       return url;
     }
     var _encode = options && options.encode || encode;
+    if (utils$1.isFunction(options)) {
+      options = {
+        serialize: options
+      };
+    }
     var serializeFn = options && options.serialize;
     var serializedParams;
     if (serializeFn) {
@@ -3806,7 +3811,7 @@
   var Axios = /*#__PURE__*/function () {
     function Axios(instanceConfig) {
       _classCallCheck(this, Axios);
-      this.defaults = instanceConfig;
+      this.defaults = instanceConfig || {};
       this.interceptors = {
         request: new InterceptorManager$1(),
         response: new InterceptorManager$1()
