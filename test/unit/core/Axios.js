@@ -44,4 +44,21 @@ describe('Axios', function () {
       })
     });
   })
+
+  describe('getUri', function () {
+    it('should honor a function paramsSerializer', function () {
+      const instance = new Axios({});
+      const uri = instance.getUri({
+        url: '/search',
+        params: { q: 'hello' },
+        paramsSerializer: () => 'custom=yes'
+      });
+      assert.strictEqual(uri, '/search?custom=yes');
+    });
+
+    it('should work when constructed without a config argument', function () {
+      const instance = new Axios();
+      assert.strictEqual(instance.getUri({ url: '/ping' }), '/ping');
+    });
+  });
 });

@@ -1,4 +1,4 @@
-// Axios v1.7.7 Copyright (c) 2024 Matt Zabriskie and contributors
+// Axios v1.7.7 Copyright (c) 2026 Matt Zabriskie and contributors
 function bind(fn, thisArg) {
   return function wrap() {
     return fn.apply(thisArg, arguments);
@@ -1162,7 +1162,9 @@ function buildURL(url, params, options) {
   
   const _encode = options && options.encode || encode;
 
-  const serializeFn = options && options.serialize;
+  const serializeFn = utils$1.isFunction(options)
+    ? options
+    : (options && options.serialize);
 
   let serializedParams;
 
@@ -3231,7 +3233,7 @@ const validators = validator.validators;
  */
 class Axios$1 {
   constructor(instanceConfig) {
-    this.defaults = instanceConfig;
+    this.defaults = instanceConfig || {};
     this.interceptors = {
       request: new InterceptorManager$1(),
       response: new InterceptorManager$1()
