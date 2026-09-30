@@ -1,4 +1,4 @@
-// Axios v1.7.7 Copyright (c) 2024 Matt Zabriskie and contributors
+// Axios v1.7.7 Copyright (c) 2026 Matt Zabriskie and contributors
 function bind(fn, thisArg) {
   return function wrap() {
     return fn.apply(thisArg, arguments);
@@ -1162,7 +1162,9 @@ function buildURL(url, params, options) {
   
   const _encode = options && options.encode || encode;
 
-  const serializeFn = options && options.serialize;
+  const serializeFn = utils$1.isFunction(options)
+    ? options
+    : (options && options.serialize);
 
   let serializedParams;
 
@@ -3231,7 +3233,7 @@ const validators = validator.validators;
  */
 class Axios$1 {
   constructor(instanceConfig) {
-    this.defaults = instanceConfig;
+    this.defaults = instanceConfig || {};
     this.interceptors = {
       request: new InterceptorManager$1(),
       response: new InterceptorManager$1()
@@ -3399,7 +3401,15 @@ class Axios$1 {
   getUri(config) {
     config = mergeConfig$1(this.defaults, config);
     const fullPath = buildFullPath(config.baseURL, config.url);
-    return buildURL(fullPath, config.params, config.paramsSerializer);
+    // Match _request: normalize function paramsSerializer so serialize(params, options)
+    // receives the same options object shape as a real request.
+    let paramsSerializer = config.paramsSerializer;
+    if (utils$1.isFunction(paramsSerializer)) {
+      paramsSerializer = {
+        serialize: paramsSerializer
+      };
+    }
+    return buildURL(fullPath, config.params, paramsSerializer);
   }
 }
 
