@@ -1786,7 +1786,7 @@ describe('supports http with nodejs', function () {
           res.send(JSON.stringify(req.body));
         });
 
-        server = app.listen(3001, function () {
+        server = app.listen(43101, function () {
           // multer can parse the following key/value pairs to an array (indexes: null, false, true):
           // arr: '1'
           // arr: '2'
@@ -1798,7 +1798,7 @@ describe('supports http with nodejs', function () {
           // arr[1]: '2'
           // -------------
           Promise.all([null, false, true].map(function (mode) {
-            return axios.postForm('http://localhost:3001/', obj, {formSerializer: {indexes: mode}})
+            return axios.postForm('http://localhost:43101/', obj, {formSerializer: {indexes: mode}})
               .then(function (res) {
                 assert.deepStrictEqual(res.data, obj, 'Index mode ' + mode);
               });
@@ -1845,8 +1845,8 @@ describe('supports http with nodejs', function () {
         res.send(JSON.stringify(req.body));
       });
 
-      server = app.listen(3001, function () {
-        return axios.post('http://localhost:3001/', obj, {
+      server = app.listen(43101, function () {
+        return axios.post('http://localhost:43101/', obj, {
           headers: {
             'content-type': 'application/x-www-form-urlencoded'
           }
@@ -1877,8 +1877,8 @@ describe('supports http with nodejs', function () {
 
     server = http.createServer(function (req, res) {
       req.pipe(res);
-    }).listen(3001, () => {
-      return axios.post('http://localhost:3001/', obj, {
+    }).listen(43101, () => {
+      return axios.post('http://localhost:43101/', obj, {
         headers: {
           'content-type': 'application/x-www-form-urlencoded'
         },
