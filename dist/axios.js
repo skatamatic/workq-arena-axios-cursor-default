@@ -1,4 +1,4 @@
-// Axios v1.7.7 Copyright (c) 2024 Matt Zabriskie and contributors
+// Axios v1.7.7 Copyright (c) 2026 Matt Zabriskie and contributors
 (function (global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
   typeof define === 'function' && define.amd ? define(factory) :
@@ -3806,7 +3806,7 @@
   var Axios = /*#__PURE__*/function () {
     function Axios(instanceConfig) {
       _classCallCheck(this, Axios);
-      this.defaults = instanceConfig;
+      this.defaults = instanceConfig || {};
       this.interceptors = {
         request: new InterceptorManager$1(),
         response: new InterceptorManager$1()
@@ -3969,7 +3969,13 @@
       value: function getUri(config) {
         config = mergeConfig(this.defaults, config);
         var fullPath = buildFullPath(config.baseURL, config.url);
-        return buildURL(fullPath, config.params, config.paramsSerializer);
+        var paramsSerializer = config.paramsSerializer;
+        if (utils$1.isFunction(paramsSerializer)) {
+          paramsSerializer = {
+            serialize: paramsSerializer
+          };
+        }
+        return buildURL(fullPath, config.params, paramsSerializer);
       }
     }]);
     return Axios;
