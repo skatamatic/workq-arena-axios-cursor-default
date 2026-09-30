@@ -3969,7 +3969,15 @@
       value: function getUri(config) {
         config = mergeConfig(this.defaults, config);
         var fullPath = buildFullPath(config.baseURL, config.url);
-        return buildURL(fullPath, config.params, config.paramsSerializer);
+        // Match _request: normalize function paramsSerializer so serialize(params, options)
+        // receives the same options object shape as a real request.
+        var paramsSerializer = config.paramsSerializer;
+        if (utils$1.isFunction(paramsSerializer)) {
+          paramsSerializer = {
+            serialize: paramsSerializer
+          };
+        }
+        return buildURL(fullPath, config.params, paramsSerializer);
       }
     }]);
     return Axios;

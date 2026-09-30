@@ -171,6 +171,19 @@ describe('instance', function () {
     })).toBe('/search?custom=yes');
   });
 
+  it('should pass the same options shape to function paramsSerializer in getUri as request', function() {
+    expect(axios.getUri({
+      url: '/u',
+      params: {
+        a: 1
+      },
+      paramsSerializer: function(params, options) {
+        return 'isFn=' + (typeof options === 'function') +
+          '&hasSerialize=' + !!(options && options.serialize);
+      }
+    })).toBe('/u?isFn=false&hasSerialize=true');
+  });
+
   it('should allow Axios to be constructed without a config argument', function() {
     const instance = new axios.Axios();
     expect(instance.getUri({ url: '/ping' })).toBe('/ping');

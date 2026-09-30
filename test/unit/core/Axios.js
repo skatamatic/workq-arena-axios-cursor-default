@@ -56,6 +56,19 @@ describe('Axios', function () {
       assert.strictEqual(uri, '/search?custom=yes');
     });
 
+    it('should pass the same options shape to function paramsSerializer as request', function () {
+      const instance = new Axios({});
+      const uri = instance.getUri({
+        url: '/u',
+        params: { a: 1 },
+        paramsSerializer: (params, options) => {
+          return 'isFn=' + (typeof options === 'function') +
+            '&hasSerialize=' + !!(options && options.serialize);
+        }
+      });
+      assert.strictEqual(uri, '/u?isFn=false&hasSerialize=true');
+    });
+
     it('should work when constructed without a config argument', function () {
       const instance = new Axios();
       assert.strictEqual(instance.getUri({ url: '/ping' }), '/ping');
