@@ -3970,10 +3970,17 @@
         config = mergeConfig(this.defaults, config);
         var fullPath = buildFullPath(config.baseURL, config.url);
         var paramsSerializer = config.paramsSerializer;
-        if (utils$1.isFunction(paramsSerializer)) {
-          paramsSerializer = {
-            serialize: paramsSerializer
-          };
+        if (paramsSerializer != null) {
+          if (utils$1.isFunction(paramsSerializer)) {
+            paramsSerializer = {
+              serialize: paramsSerializer
+            };
+          } else {
+            validator.assertOptions(paramsSerializer, {
+              encode: validators["function"],
+              serialize: validators["function"]
+            }, true);
+          }
         }
         return buildURL(fullPath, config.params, paramsSerializer);
       }

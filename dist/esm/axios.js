@@ -3400,10 +3400,17 @@ class Axios$1 {
     config = mergeConfig$1(this.defaults, config);
     const fullPath = buildFullPath(config.baseURL, config.url);
     let paramsSerializer = config.paramsSerializer;
-    if (utils$1.isFunction(paramsSerializer)) {
-      paramsSerializer = {
-        serialize: paramsSerializer
-      };
+    if (paramsSerializer != null) {
+      if (utils$1.isFunction(paramsSerializer)) {
+        paramsSerializer = {
+          serialize: paramsSerializer
+        };
+      } else {
+        validator.assertOptions(paramsSerializer, {
+          encode: validators.function,
+          serialize: validators.function
+        }, true);
+      }
     }
     return buildURL(fullPath, config.params, paramsSerializer);
   }

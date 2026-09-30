@@ -88,6 +88,18 @@ describe('Axios', function () {
       );
     });
 
+    it('should reject an invalid object-form paramsSerializer like request does', function () {
+      assert.throws(function () {
+        axios.getUri({
+          url: '/search',
+          params: {q: 'hello'},
+          paramsSerializer: {
+            serialize: 'not-a-function'
+          }
+        });
+      }, /option serialize must be a function/);
+    });
+
     it('should honor explicit constructor configuration', function () {
       const instance = new axios.Axios({
         baseURL: 'https://api.example.com',
